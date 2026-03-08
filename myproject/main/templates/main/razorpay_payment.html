@@ -1,0 +1,72 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}Payment{% endblock %}
+
+{% block content %}
+<div style="max-width:500px;margin:40px auto;padding:30px;background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.1);">
+    <h2 style="text-align:center;">Complete Payment</h2>
+    <hr>
+
+    <p><strong>Order ID:</strong> #{{ order.pk|default:"0" }}</p>
+    <p><strong>Restaurant:</strong> {{ order.restaurant.name|default:"N/A" }}</p>
+    <p><strong>Total Amount:</strong> ₹{{ order.total_price|default:"0" }}</p>
+
+    <button id="paymentBtn" 
+            style="width:100%;padding:12px;background:#667eea;color:white;border:none;border-radius:6px;font-size:16px;cursor:pointer;">
+        Pay with Razorpay
+    </button>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const totalAmount = parseFloat("{{ order.total_price|default:'0' }}");
+    const razorpayOrderId = "{{ razorpay_order_id|default:'' }}";
+
+    if (!totalAmount || !razorpayOrderId) {
+        alert("Payment cannot be processed. Amount or Order ID missing!");
+        return;
+    }
+
+    const options = {
+        "key": "{{ razorpay_key }}",
+        "amount": totalAmount * 100, // amount in paise
+        "currency": "INR",
+        "name": "Swiggy Clone",
+        "description": "Order #{{ order.pk }}",
+        "order_id": razorpayOrderId,
+        "handler": function(response){
+            fetch("{% url 'main:razorpay_callback' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({
+                    "order_id": "{{ order.pk }}",
+                    "razorpay_payment_id": response.razorpay_payment_id,
+                    "razorpay_signature": response.razorpay_signature
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success"){
+                    alert("Payment Successful!");
+                    window.location.href = "/order/{{ order.pk }}/track/";
+                } else {
+                    alert("Payment verification failed!");
+                }
+            })
+        },
+        "theme": { "color": "#635bff" }
+    };
+
+    document.getElementById("paymentBtn").onclick = function(e){
+        e.preventDefault();
+        var rzp = new Razorpay(options);
+        rzp.open();
+    }
+});
+</script>
+{% endblock %}

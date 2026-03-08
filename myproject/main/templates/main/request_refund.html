@@ -1,0 +1,286 @@
+{% extends 'main/base.html' %}
+{% block title %}Request Refund{% endblock %}
+{% block content %}
+<style>
+    .refund-container {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .refund-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .refund-header h2 {
+        color: #333;
+        margin: 0 0 10px 0;
+        font-size: 28px;
+    }
+
+    .refund-header p {
+        color: #999;
+        margin: 0;
+    }
+
+    .form-section {
+        margin-bottom: 25px;
+    }
+
+    .form-section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-control textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .order-info {
+        background: #f9fafb;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .info-value {
+        color: #666;
+    }
+
+    .reason-options {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .reason-option {
+        position: relative;
+    }
+
+    .reason-radio {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .reason-label {
+        display: block;
+        padding: 12px;
+        border: 2px solid #e5e7eb;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .reason-radio:checked + .reason-label {
+        border-color: #667eea;
+        background: #eff6ff;
+    }
+
+    .form-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+    .btn-submit {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+        transition: background 0.3s;
+        flex: 1;
+    }
+
+    .btn-submit:hover {
+        background: #764ba2;
+    }
+
+    .btn-cancel {
+        background: #f3f4f6;
+        color: #1f2937;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+
+    .btn-cancel:hover {
+        background: #e5e7eb;
+    }
+
+    .warning-box {
+        background: #fef3c7;
+        border-left: 4px solid #d97706;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+    .warning-text {
+        color: #92400e;
+        margin: 0;
+    }
+</style>
+
+<div class="refund-container">
+    <div class="refund-header">
+        <h2>↩️ Request Refund</h2>
+        <p>Let us know if you're not satisfied with your order</p>
+    </div>
+
+    <!-- Order Details -->
+    <div class="form-section">
+        <div class="form-section-title">Order Details</div>
+        <div class="order-info">
+            <div class="info-row">
+                <span class="info-label">Order ID:</span>
+                <span class="info-value">#{{ order.pk }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Restaurant:</span>
+                <span class="info-value">{{ order.restaurant.name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Order Total:</span>
+                <span class="info-value"><strong>₹{{ order.total_price }}</strong></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Delivered on:</span>
+                <span class="info-value">{{ order.created_at|date:"d M, Y" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Box -->
+    <div class="warning-box">
+        <p class="warning-text">
+            ⚠️ <strong>Please note:</strong> Refund requests must be submitted within 7 days of delivery. Our team will review your request and process the refund within 5-7 business days.
+        </p>
+    </div>
+
+    <!-- Refund Form -->
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Refund Reason -->
+        <div class="form-section">
+            <div class="form-section-title">Why are you requesting a refund? *</div>
+            <div class="reason-options">
+                <div class="reason-option">
+                    <input type="radio" id="wrong" name="reason" value="wrong_order" class="reason-radio" required>
+                    <label for="wrong" class="reason-label">
+                        <strong>Wrong Order Received</strong>
+                        <span style="display: block; font-size: 12px; color: #6b7280; margin-top: 4px;">I received the wrong items</span>
+                    </label>
+                </div>
+
+                <div class="reason-option">
+                    <input type="radio" id="damaged" name="reason" value="damaged" class="reason-radio">
+                    <label for="damaged" class="reason-label">
+                        <strong>Food Damaged or Not Fresh</strong>
+                        <span style="display: block; font-size: 12px; color: #6b7280; margin-top: 4px;">The food quality was poor</span>
+                    </label>
+                </div>
+
+                <div class="reason-option">
+                    <input type="radio" id="late" name="reason" value="late_delivery" class="reason-radio">
+                    <label for="late" class="reason-label">
+                        <strong>Late Delivery</strong>
+                        <span style="display: block; font-size: 12px; color: #6b7280; margin-top: 4px;">Order was delivered much later than expected</span>
+                    </label>
+                </div>
+
+                <div class="reason-option">
+                    <input type="radio" id="quality" name="reason" value="quality_issue" class="reason-radio">
+                    <label for="quality" class="reason-label">
+                        <strong>Quality Issue</strong>
+                        <span style="display: block; font-size: 12px; color: #6b7280; margin-top: 4px;">Items were missing or incomplete</span>
+                    </label>
+                </div>
+
+                <div class="reason-option">
+                    <input type="radio" id="other" name="reason" value="other" class="reason-radio">
+                    <label for="other" class="reason-label">
+                        <strong>Other Reason</strong>
+                        <span style="display: block; font-size: 12px; color: #6b7280; margin-top: 4px;">Please describe below</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-section">
+            <div class="form-section-title">Please describe the issue in detail *</div>
+            <div class="form-group">
+                <label for="description" class="form-label">Description</label>
+                <textarea name="description" id="description" class="form-control" placeholder="Tell us what went wrong with your order..." required></textarea>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-buttons">
+            <button type="submit" class="btn-submit">✓ Submit Refund Request</button>
+            <a href="{% url 'main:order_tracking' order.pk %}" class="btn-cancel">← Cancel</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends 'main/base.html' %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<style>
+    .login-container {
+        max-width: 450px;
+        margin: 60px auto;
+    }
+
+    .login-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .login-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+    }
+
+    .login-header h2 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .login-header p {
+        margin: 10px 0 0 0;
+        opacity: 0.9;
+        font-size: 14px;
+    }
+
+    .login-body {
+        padding: 40px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        box-sizing: border-box;
+        transition: border-color 0.3s;
+    }
+  body{
+    background: linear-gradient(135deg,#f3f6ff,#e6ecff,#f7e9ff,#e9f7ff);
+    min-height:100vh;
+}
+.login-card {
+    background: rgba(255,255,255,0.96);
+    border-radius: 12px;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+    overflow: hidden;
+    transition: transform 0.3s;
+}
+
+.login-card:hover{
+    transform: translateY(-5px);
+}
+.login-header {
+    background: linear-gradient(135deg,#667eea,#7f5af0,#764ba2);
+}
+.btn-login:hover{
+    transform: translateY(-2px);
+    box-shadow:0 8px 20px rgba(118,75,162,0.4);
+}
+
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-top: 10px;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .login-footer {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .login-footer p {
+        margin: 0 0 10px 0;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .login-footer a {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .login-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .alert-error {
+        background: #fee;
+        color: #c33;
+        border: 1px solid #fcc;
+    }
+
+    .alert-success {
+        background: #efe;
+        color: #390;
+        border: 1px solid #cfc;
+    }
+
+    .forgot-link {
+        text-align: right;
+        margin-top: -10px;
+        margin-bottom: 15px;
+    }
+
+    .forgot-link a {
+        color: #667eea;
+        font-size: 12px;
+        text-decoration: none;
+    }
+
+    .forgot-link a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h2>Welcome Back!</h2>
+            <p>Login to your account</p>
+        </div>
+
+        <div class="login-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" id="loginForm">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+
+                <button type="submit" class="btn-login">Login</button>
+            </form>
+
+            <div class="login-footer">
+                <p>Don't have an account? <a href="{% url 'main:register' %}">Register here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        
+        if (!username || !password) {
+            e.preventDefault();
+            alert('Please enter both username and password!');
+            return false;
+        }
+    });
+</script>
+{% endblock %}

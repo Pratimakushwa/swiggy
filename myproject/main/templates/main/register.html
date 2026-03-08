@@ -1,0 +1,227 @@
+{% extends 'main/base.html' %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<style>
+    .register-container {
+        max-width: 600px;
+        margin: 40px auto;
+    }
+
+    .register-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .register-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+
+    .register-header h2 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .register-body {
+        padding: 40px;
+    }
+    body{
+    background: linear-gradient(135deg,#f3f6ff,#e6ecff,#f7e9ff,#e9f7ff);
+    min-height:100vh;
+}
+.register-card {
+    background: rgba(255,255,255,0.96);
+    border-radius: 12px;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+    overflow: hidden;
+    transition: transform 0.3s;
+}
+
+.register-card:hover{
+    transform: translateY(-5px);
+}
+
+.register-header {
+    background: linear-gradient(135deg,#667eea,#7f5af0,#764ba2);
+}
+.btn-register:hover{
+    transform: translateY(-2px);
+    box-shadow:0 8px 20px rgba(118,75,162,0.4);
+}
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        box-sizing: border-box;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .btn-register {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-top: 20px;
+    }
+
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .register-footer {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .register-footer a {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .register-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .alert-error {
+        background: #fee;
+        color: #c33;
+        border: 1px solid #fcc;
+    }
+
+    .alert-success {
+        background: #efe;
+        color: #390;
+        border: 1px solid #cfc;
+    }
+</style>
+
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-header">
+            <h2>Create Account</h2>
+        </div>
+
+        <div class="register-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" id="registerForm">
+                {% csrf_token %}
+
+                <!-- Name Fields -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" placeholder="First name">
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Last name">
+                    </div>
+                </div>
+
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="username" class="form-label">Username *</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" required>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address *</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="your@email.com" required>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password1" class="form-label">Password *</label>
+                    <input type="password" class="form-control" id="password1" name="password1" placeholder="Enter a strong password" required>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="password2" class="form-label">Confirm Password *</label>
+                    <input type="password" class="form-control" id="password2" name="password2" placeholder="Re-enter password" required>
+                </div>
+
+                <button type="submit" class="btn-register">Register</button>
+            </form>
+
+            <div class="register-footer">
+                Already have an account? <a href="{% url 'main:login' %}">Login here</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        const pwd1 = document.getElementById('password1').value;
+        const pwd2 = document.getElementById('password2').value;
+        
+        if (pwd1 !== pwd2) {
+            e.preventDefault();
+            alert('Passwords do not match!');
+            return false;
+        }
+
+        if (pwd1.length < 6) {
+            e.preventDefault();
+            alert('Password must be at least 6 characters long!');
+            return false;
+        }
+    });
+</script>
+{% endblock %}

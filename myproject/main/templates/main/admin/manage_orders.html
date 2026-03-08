@@ -1,0 +1,203 @@
+{% extends 'main/base.html' %}
+{% block title %}Manage Orders{% endblock %}
+{% block content %}
+<style>
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    .admin-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #1f2937;
+    }
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+    .btn-primary:hover {
+        background: #2563eb;
+    }
+
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .orders-table thead {
+        background: #1f2937;
+        color: white;
+    }
+    .orders-table th {
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+    }
+    .orders-table td {
+        padding: 15px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .orders-table tbody tr:hover {
+        background: #f9fafb;
+    }
+    .orders-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .status-placed {
+        background: #fef3c7;
+        color: #b45309;
+    }
+    .status-preparing {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    .status-out_for_delivery {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+    .status-delivered {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    .status-cancelled {
+        background: #fee2e2;
+        color: #7f1d1d;
+    }
+
+    .btn-update {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 12px;
+        transition: background 0.3s;
+    }
+    .btn-update:hover {
+        background: #059669;
+    }
+
+    .no-orders {
+        text-align: center;
+        padding: 50px;
+        color: #6b7280;
+        background: white;
+        border-radius: 8px;
+    }
+
+    .order-id {
+        font-weight: bold;
+        color: #3b82f6;
+    }
+
+    .payment-status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .payment-pending {
+        background: #fef3c7;
+        color: #b45309;
+    }
+    .payment-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    .payment-failed {
+        background: #fee2e2;
+        color: #7f1d1d;
+    }
+</style>
+
+<div class="admin-header">
+    <div class="admin-title">📬 Manage Orders</div>
+    <a href="{% url 'main:admin_dashboard' %}" class="btn-primary">← Dashboard</a>
+</div>
+
+{% if orders %}
+    <table class="orders-table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Restaurant</th>
+                <th>Total Price</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td><span class="order-id">#{{ order.pk }}</span></td>
+                    <td>{{ order.user.username }}</td>
+                    <td>{{ order.restaurant.name }}</td>
+                    <td><strong>₹{{ order.total_price }}</strong></td>
+                    <td>
+                        <span class="payment-status-badge payment-{{ order.payment_status }}">
+                            {% if order.payment_status == 'pending' %}
+                                ⏳ Pending
+                            {% elif order.payment_status == 'completed' %}
+                                ✓ Completed
+                            {% elif order.payment_status == 'failed' %}
+                                ✗ Failed
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ order.status }}">
+                            {% if order.status == 'placed' %}
+                                ⏳ Placed
+                            {% elif order.status == 'preparing' %}
+                                👨‍🍳 Preparing
+                            {% elif order.status == 'out_for_delivery' %}
+                                🚚 Out for Delivery
+                            {% elif order.status == 'delivered' %}
+                                ✓ Delivered
+                            {% elif order.status == 'cancelled' %}
+                                ✗ Cancelled
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>{{ order.created_at|date:"d M, Y" }}</td>
+                    <td>
+                        <a href="{% url 'main:update_order_status' order.pk %}" class="btn-update">📝 Update Status</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="no-orders">
+        <p>No orders yet.</p>
+    </div>
+{% endif %}
+
+{% endblock %}

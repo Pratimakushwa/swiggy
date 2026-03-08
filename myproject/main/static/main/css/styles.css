@@ -1,0 +1,13 @@
+/* Custom styles for food delivery app */
+body {
+    background-color: #f8f9fa;
+}
+.navbar-brand img {
+    height: 40px;
+}
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.alert {
+    margin-top: 1rem;
+}

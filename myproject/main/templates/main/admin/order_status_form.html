@@ -1,0 +1,140 @@
+{% extends 'main/base.html' %}
+{% block title %}Update Order #{{ order.pk }}{% endblock %}
+{% block content %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .form-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 25px;
+        color: #1f2937;
+    }
+    .order-details {
+        background: #f9fafb;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+    }
+    .order-detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .order-detail-item:last-child {
+        border-bottom: none;
+    }
+    .detail-label {
+        font-weight: 600;
+        color: #374151;
+    }
+    .detail-value {
+        color: #6b7280;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+    .form-group select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: inherit;
+    }
+    .form-group select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .form-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    .btn-save {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+    .btn-save:hover {
+        background: #059669;
+    }
+    .btn-cancel {
+        background: #f3f4f6;
+        color: #1f2937;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+    .btn-cancel:hover {
+        background: #e5e7eb;
+    }
+</style>
+
+<div class="form-container">
+    <div class="form-title">📝 Update Order Status</div>
+    
+    <div class="order-details">
+        <div class="order-detail-item">
+            <span class="detail-label">Order ID:</span>
+            <span class="detail-value">#{{ order.pk }}</span>
+        </div>
+        <div class="order-detail-item">
+            <span class="detail-label">Customer:</span>
+            <span class="detail-value">{{ order.user.username }}</span>
+        </div>
+        <div class="order-detail-item">
+            <span class="detail-label">Restaurant:</span>
+            <span class="detail-value">{{ order.restaurant.name }}</span>
+        </div>
+        <div class="order-detail-item">
+            <span class="detail-label">Total Price:</span>
+            <span class="detail-value"><strong>₹{{ order.total_price }}</strong></span>
+        </div>
+        <div class="order-detail-item">
+            <span class="detail-label">Placed on:</span>
+            <span class="detail-value">{{ order.created_at|date:"d M, Y H:i" }}</span>
+        </div>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_status">Order Status:</label>
+            {{ form.status }}
+            <small style="color: #6b7280; margin-top: 8px; display: block;">
+                ⏳ Placed → 👨‍🍳 Preparing → 🚚 Out for Delivery → ✓ Delivered
+            </small>
+        </div>
+        
+        <div class="form-buttons">
+            <button type="submit" class="btn-save">✓ Update Status</button>
+            <a href="{% url 'main:manage_orders' %}" class="btn-cancel">← Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,292 @@
+{% extends 'main/base.html' %}
+{% block title %}Order Tracking{% endblock %}
+{% block content %}
+<style>
+    .tracking-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .tracking-header {
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 20px;
+    }
+
+    .tracking-header h2 {
+        color: #333;
+        margin: 0 0 10px 0;
+        font-size: 28px;
+    }
+
+    .order-status {
+        display: inline-block;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .detail-section {
+        margin: 20px 0;
+        padding: 15px;
+        background: #f9f9f9;
+        border-left: 4px solid #667eea;
+        border-radius: 4px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .detail-value {
+        color: #666;
+    }
+
+    .payment-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .payment-pending {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    .payment-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .payment-failed {
+        background: #fee2e2;
+        color: #7f1d1d;
+    }
+
+    .status-timeline {
+        margin: 30px 0;
+        position: relative;
+    }
+
+    .timeline-step {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .timeline-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e5e7eb;
+        color: #6b7280;
+        font-size: 20px;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+
+    .timeline-step.active .timeline-icon {
+        background: #667eea;
+        color: white;
+    }
+
+    .timeline-content {
+        flex: 1;
+    }
+
+    .timeline-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .timeline-desc {
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    .back-button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: background 0.3s;
+    }
+
+    .back-button:hover {
+        background: #764ba2;
+    }
+</style>
+
+<div class="tracking-container">
+    <div class="tracking-header">
+        <h2>Order #{{ order.pk }}</h2>
+        <div class="order-status">
+            {% if order.status == 'placed' %}
+                ⏳ Order Placed
+            {% elif order.status == 'preparing' %}
+                👨‍🍳 Preparing
+            {% elif order.status == 'out_for_delivery' %}
+                🚚 Out for Delivery
+            {% elif order.status == 'delivered' %}
+                ✓ Delivered
+            {% elif order.status == 'cancelled' %}
+                ✗ Cancelled
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <div class="detail-row">
+            <span class="detail-label">🏪 Restaurant:</span>
+            <span class="detail-value">{{ order.restaurant.name }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">💰 Total Amount:</span>
+            <span class="detail-value"><strong>₹{{ order.total_price }}</strong></span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">💳 Payment Status:</span>
+            <span class="detail-value">
+                <span class="payment-badge payment-{{ order.payment_status }}">
+                    {% if order.payment_status == 'pending' %}
+                        ⏳ Pending
+                    {% elif order.payment_status == 'completed' %}
+                        ✓ Completed
+                    {% elif order.payment_status == 'failed' %}
+                        ✗ Failed
+                    {% endif %}
+                </span>
+            </span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">💳 Payment Method:</span>
+            <span class="detail-value">
+                {% if order.payment_method == 'cod' %}
+                    Cash on Delivery
+                {% elif order.payment_method == 'online' %}
+                    Online Payment
+                {% endif %}
+            </span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">📍 Delivery Address:</span>
+            <span class="detail-value">{{ order.address }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">🕐 Placed at:</span>
+            <span class="detail-value">{{ order.created_at|date:"d M, Y - H:i" }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">↩️ Refund Status:</span>
+            <span class="detail-value">
+                <span class="payment-badge {% if order.refund_status == 'no_request' %}payment-pending{% elif order.refund_status == 'requested' %}payment-pending{% elif order.refund_status == 'approved' %}payment-completed{% elif order.refund_status == 'completed' %}payment-completed{% else %}payment-failed{% endif %}">
+                    {% if order.refund_status == 'no_request' %}
+                        No Refund Request
+                    {% elif order.refund_status == 'requested' %}
+                        ⏳ Pending Approval
+                    {% elif order.refund_status == 'approved' %}
+                        ✓ Approved
+                    {% elif order.refund_status == 'rejected' %}
+                        ✗ Rejected
+                    {% elif order.refund_status == 'completed' %}
+                        ✓ Refund Completed
+                    {% endif %}
+                </span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Refund Section -->
+    {% if order.status == 'delivered' and order.refund_status == 'no_request' %}
+    <div class="detail-section" style="background: #fef3c7; border-left-color: #d97706;">
+        <h3 style="color: #92400e; margin-top: 0;">↩️ Not Satisfied? Request a Refund</h3>
+        <p style="color: #b45309; font-size: 13px; margin-bottom: 15px;">You can request a refund within 7 days of delivery.</p>
+        <a href="{% url 'main:request_refund' order.pk %}" style="display: inline-block; padding: 10px 20px; background: #d97706; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">Request Refund</a>
+    </div>
+    {% elif order.refund_request %}
+    <div class="detail-section" style="background: #f0fdf4; border-left-color: #10b981;">
+        <h3 style="color: #065f46; margin-top: 0;">↩️ Your Refund Request</h3>
+        <div class="detail-row">
+            <span class="detail-label">Reason:</span>
+            <span class="detail-value">{{ order.refund_request.get_reason_display }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Status:</span>
+            <span class="detail-value">
+                <span class="payment-badge {% if order.refund_request.status == 'pending' %}payment-pending{% elif order.refund_request.status == 'approved' %}payment-completed{% elif order.refund_request.status == 'completed' %}payment-completed{% else %}payment-failed{% endif %}">
+                    {{ order.refund_request.get_status_display }}
+                </span>
+            </span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Refund Amount:</span>
+            <span class="detail-value"><strong>₹{{ order.refund_request.refund_amount }}</strong></span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Requested on:</span>
+            <span class="detail-value">{{ order.refund_request.requested_at|date:"d M, Y - H:i" }}</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="status-timeline">
+        <div class="timeline-step {% if order.status != 'cancelled' %}active{% endif %}">
+            <div class="timeline-icon">📋</div>
+            <div class="timeline-content">
+                <div class="timeline-label">Order Placed</div>
+                <div class="timeline-desc">Your order has been placed successfully</div>
+            </div>
+        </div>
+
+        <div class="timeline-step {% if order.status in 'preparing|out_for_delivery|delivered' %}active{% endif %}">
+            <div class="timeline-icon">👨‍🍳</div>
+            <div class="timeline-content">
+                <div class="timeline-label">Being Prepared</div>
+                <div class="timeline-desc">Your food is being prepared</div>
+            </div>
+        </div>
+
+        <div class="timeline-step {% if order.status in 'out_for_delivery|delivered' %}active{% endif %}">
+            <div class="timeline-icon">🚚</div>
+            <div class="timeline-content">
+                <div class="timeline-label">Out for Delivery</div>
+                <div class="timeline-desc">Your order is on the way</div>
+            </div>
+        </div>
+
+        <div class="timeline-step {% if order.status == 'delivered' %}active{% endif %}">
+            <div class="timeline-icon">✓</div>
+            <div class="timeline-content">
+                <div class="timeline-label">Delivered</div>
+                <div class="timeline-desc">Enjoy your food!</div>
+            </div>
+        </div>
+    </div>
+
+    <a href="{% url 'main:home' %}" class="back-button">← Back to Home</a>
+</div>
+
+{% endblock %}

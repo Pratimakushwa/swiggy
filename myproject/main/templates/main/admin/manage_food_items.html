@@ -1,0 +1,187 @@
+{% extends 'main/base.html' %}
+{% block title %}Manage Food Items{% endblock %}
+{% block content %}
+<style>
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    .admin-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #1f2937;
+    }
+    .header-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+    .btn-primary:hover {
+        background: #2563eb;
+    }
+    .btn-success {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+    .btn-success:hover {
+        background: #059669;
+    }
+
+    .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .items-table thead {
+        background: #1f2937;
+        color: white;
+    }
+    .items-table th {
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+    }
+    .items-table td {
+        padding: 15px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .items-table tbody tr:hover {
+        background: #f9fafb;
+    }
+    .items-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+    .btn-edit {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 12px;
+        transition: background 0.3s;
+    }
+    .btn-edit:hover {
+        background: #2563eb;
+    }
+    .btn-delete {
+        background: #ef4444;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 12px;
+        transition: background 0.3s;
+    }
+    .btn-delete:hover {
+        background: #dc2626;
+    }
+
+    .price-badge {
+        background: #ecfdf5;
+        color: #10b981;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    .available-badge {
+        background: #ecfdf5;
+        color: #10b981;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+    .unavailable-badge {
+        background: #fee2e2;
+        color: #ef4444;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    .no-items {
+        text-align: center;
+        padding: 50px;
+        color: #6b7280;
+        background: white;
+        border-radius: 8px;
+    }
+</style>
+
+<div class="admin-header">
+    <div class="admin-title">🍕 Manage Food Items</div>
+    <div class="header-buttons">
+        <a href="{% url 'main:admin_dashboard' %}" class="btn-primary">← Dashboard</a>
+        <a href="{% url 'main:add_food_item' %}" class="btn-success">+ Add Food Item</a>
+    </div>
+</div>
+
+{% if items %}
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Food Name</th>
+                <th>Restaurant</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+                <tr>
+                    <td><strong>{{ item.name }}</strong></td>
+                    <td>{{ item.restaurant.name }}</td>
+                    <td><span class="price-badge">₹{{ item.price }}</span></td>
+                    <td>
+                        {% if item.available %}
+                            <span class="available-badge">✓ Available</span>
+                        {% else %}
+                            <span class="unavailable-badge">✗ Unavailable</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'main:edit_food_item' item.pk %}" class="btn-edit">✏️ Edit</a>
+                            <a href="{% url 'main:delete_food_item' item.pk %}" class="btn-delete">🗑️ Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="no-items">
+        <p>No food items added yet. <a href="{% url 'main:add_food_item' %}" style="color: #3b82f6;">Click here to add one</a></p>
+    </div>
+{% endif %}
+
+{% endblock %}

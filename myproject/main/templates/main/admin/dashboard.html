@@ -1,0 +1,217 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<style>
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    .admin-title {
+        font-size: 32px;
+        font-weight: bold;
+        color: #1f2937;
+    }
+    .back-btn {
+        background: #f3f4f6;
+        color: #1f2937;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+    .back-btn:hover {
+        background: #e5e7eb;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 50px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-left: 4px solid;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+
+    .stat-card.users {
+        border-left-color: #3b82f6;
+    }
+    .stat-card.restaurants {
+        border-left-color: #10b981;
+    }
+    .stat-card.orders {
+        border-left-color: #f59e0b;
+    }
+    .stat-card.pending {
+        border-left-color: #ef4444;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-size: 36px;
+        font-weight: bold;
+        color: #1f2937;
+    }
+
+    .admin-menu {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 40px;
+    }
+
+    .menu-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .menu-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+
+    .menu-card-icon {
+        font-size: 40px;
+        margin-bottom: 15px;
+    }
+
+    .menu-card-title {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #1f2937;
+    }
+
+    .menu-card-desc {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 15px;
+    }
+
+    .menu-card-btn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .menu-card-btn:hover {
+        background: #2563eb;
+    }
+
+    .menu-card-restaurants .menu-card-icon,
+    .menu-card-restaurants .menu-card-btn {
+        color: white;
+        background: #10b981;
+    }
+    .menu-card-restaurants .menu-card-btn:hover {
+        background: #059669;
+    }
+
+    .menu-card-food .menu-card-icon,
+    .menu-card-food .menu-card-btn {
+        color: white;
+        background: #f59e0b;
+    }
+    .menu-card-food .menu-card-btn:hover {
+        background: #d97706;
+    }
+
+    .menu-card-orders .menu-card-icon,
+    .menu-card-orders .menu-card-btn {
+        color: white;
+        background: #ef4444;
+    }
+    .menu-card-orders .menu-card-btn:hover {
+        background: #dc2626;
+    }
+</style>
+
+<div class="admin-header">
+    <div class="admin-title">🏢 Admin Dashboard</div>
+    <a href="{% url 'main:home' %}" class="back-btn">← Back to Site</a>
+</div>
+
+<!-- Statistics Cards -->
+<div class="stats-grid">
+    <div class="stat-card users">
+        <div class="stat-label">👥 Total Users</div>
+        <div class="stat-value">{{ total_users }}</div>
+    </div>
+
+    <div class="stat-card restaurants">
+        <div class="stat-label">🍽️ Total Restaurants</div>
+        <div class="stat-value">{{ total_restaurants }}</div>
+    </div>
+
+    <div class="stat-card orders">
+        <div class="stat-label">📦 Total Orders</div>
+        <div class="stat-value">{{ total_orders }}</div>
+    </div>
+
+    <div class="stat-card pending">
+        <div class="stat-label">⏳ Pending Orders</div>
+        <div class="stat-value">{{ pending_orders }}</div>
+    </div>
+</div>
+
+<!-- Management Menu -->
+<div class="admin-title" style="font-size: 24px; margin-top: 40px; margin-bottom: 20px;">Manage Everything</div>
+<div class="admin-menu">
+    <a href="{% url 'main:manage_restaurants' %}" class="menu-card menu-card-restaurants" style="text-decoration: none; color: inherit;">
+        <div class="menu-card-icon">🏪</div>
+        <div class="menu-card-title">Manage Restaurants</div>
+        <div class="menu-card-desc">Add, edit, or delete restaurants</div>
+        <button class="menu-card-btn">Go to Restaurants →</button>
+    </a>
+
+    <a href="{% url 'main:manage_food_items' %}" class="menu-card menu-card-food" style="text-decoration: none; color: inherit;">
+        <div class="menu-card-icon">🍕</div>
+        <div class="menu-card-title">Manage Food Items</div>
+        <div class="menu-card-desc">Add, edit, or delete food items</div>
+        <button class="menu-card-btn">Go to Food Items →</button>
+    </a>
+
+    <a href="{% url 'main:manage_orders' %}" class="menu-card menu-card-orders" style="text-decoration: none; color: inherit;">
+        <div class="menu-card-icon">📬</div>
+        <div class="menu-card-title">Manage Orders</div>
+        <div class="menu-card-desc">View and update order status</div>
+        <button class="menu-card-btn">Go to Orders →</button>
+    </a>
+</div>
+
+{% endblock %}

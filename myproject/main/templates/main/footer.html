@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swiggy Footer</title>
+
+<style>
+body{
+    margin:0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.footer{
+    background-color:#f5f5f6;
+    padding:50px 80px;
+}
+
+.footer-container{
+    display:grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+    gap:40px;
+}
+
+.footer h4{
+    margin-bottom:15px;
+    font-size:18px;
+}
+
+.footer a{
+    text-decoration:none;
+    color:#555;
+    display:block;
+    margin-bottom:10px;
+    font-size:14px;
+}
+
+.footer a:hover{
+    color:#ff5200;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#ff5200;
+    font-size:28px;
+    font-weight:bold;
+}
+
+.logo-box{
+    width:40px;
+    height:40px;
+    background:#ff5200;
+    border-radius:10px;
+}
+
+.copyright{
+    margin-top:10px;
+    color:#777;
+    font-size:14px;
+}
+
+.social-icons{
+    display:flex;
+    gap:15px;
+    margin-top:10px;
+}
+
+.social-icons i{
+    font-size:18px;
+    cursor:pointer;
+}
+
+.footer-bottom{
+    border-top:1px solid #ccc;
+    margin-top:40px;
+    padding-top:20px;
+}
+
+select{
+    padding:8px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+</style>
+</head>
+
+<body>
+
+<footer class="footer">
+
+<div class="footer-container">
+
+    <!-- Logo Section -->
+    <div>
+        <div class="logo">
+            <!-- <div class="logo-box"></div> -->
+            Swiggy
+        </div>
+        <div class="copyright">
+            © 2025 Swiggy Limited
+        </div>
+    </div>
+
+    <!-- Company -->
+    <div>
+        <h4>Company</h4>
+        <a href="#">About Us</a>
+        <a href="#">Swiggy Corporate</a>
+        <a href="#">Careers</a>
+        <a href="#">Team</a>
+        <a href="#">Swiggy One</a>
+        <a href="#">Swiggy Instamart</a>
+        <a href="#">Swiggy Dineout</a>
+        <a href="#">Minis</a>
+        <a href="#">Pyng</a>
+    </div>
+
+    <!-- Contact -->
+    <div>
+        <h4>Contact us</h4>
+        <a href="#">Help & Support</a>
+        <a href="#">Partner With Us</a>
+        <a href="#">Ride With Us</a>
+
+        <h4 style="margin-top:20px;">Legal</h4>
+        <a href="#">Terms & Conditions</a>
+        <a href="#">Cookie Policy</a>
+        <a href="#">Privacy Policy</a>
+    </div>
+
+    <!-- Cities -->
+    <div>
+        <h4>Available in:</h4>
+        <a href="#">Bangalore</a>
+        <a href="#">Gurgaon</a>
+        <a href="#">Hyderabad</a>
+        <a href="#">Delhi</a>
+        <a href="#">Mumbai</a>
+        <a href="#">Pune</a>
+
+        <select>
+            <option>685 cities</option>
+        </select>
+    </div>
+
+    <!-- Life at Swiggy -->
+    <div>
+        <h4>Life at Swiggy</h4>
+        <a href="#">Explore With Swiggy</a>
+        <a href="#">Swiggy News</a>
+        <a href="#">Snackables</a>
+
+        <h4 style="margin-top:20px;">Social Links</h4>
+
+        <div class="social-icons">
+            <i>🔗</i>
+            <i>📷</i>
+            <i>📘</i>
+            <i>📌</i>
+            <i>🐦</i>
+        </div>
+    </div>
+
+</div>
+
+<div class="footer-bottom"></div>
+
+</footer>
+
+</body>
+</html>

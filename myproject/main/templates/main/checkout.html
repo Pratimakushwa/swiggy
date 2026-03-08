@@ -1,0 +1,268 @@
+{% extends 'main/base.html' %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<style>
+    .checkout-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .checkout-header {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: #1f2937;
+    }
+    .checkout-form {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .form-section {
+        margin-bottom: 30px;
+    }
+    .form-section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .form-control textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .payment-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    .payment-option {
+        position: relative;
+    }
+    .payment-radio {
+        position: absolute;
+        opacity: 0;
+    }
+    .payment-label {
+        display: block;
+        padding: 15px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+    }
+    .payment-radio:checked + .payment-label {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+    .payment-icon {
+        font-size: 32px;
+        margin-bottom: 8px;
+    }
+    .payment-name {
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .order-summary {
+        background: #f9fafb;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+        font-size: 18px;
+        color: #10b981;
+        padding-top: 10px;
+        border-top: 2px solid #e5e7eb;
+    }
+
+    .form-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    .btn-place-order {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+        transition: background 0.3s;
+        flex: 1;
+    }
+    .btn-place-order:hover {
+        background: #059669;
+    }
+    .btn-cancel {
+        background: #f3f4f6;
+        color: #1f2937;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+    .btn-cancel:hover {
+        background: #e5e7eb;
+    }
+
+    .razorpay-container {
+        display: none;
+        margin-top: 20px;
+        padding: 20px;
+        background: #eff6ff;
+        border-radius: 8px;
+    }
+    .razorpay-container.show {
+        display: block;
+    }
+</style>
+
+<div class="checkout-container">
+    <div class="checkout-header">🛒 Checkout</div>
+
+    <div class="checkout-form">
+        <form method="post" id="checkoutForm">
+            {% csrf_token %}
+
+            <!-- Order Summary -->
+            <div class="form-section">
+                <div class="form-section-title">📋 Order Summary</div>
+                <div class="order-summary">
+                    {% for item in items %}
+                    <div class="summary-item">
+                        <span>{{ item.food.name }} (x{{ item.quantity }}):</span>
+                        <span>₹{{ item.subtotal }}</span>
+                    </div>
+                    {% endfor %}
+                    <div class="summary-item">
+                        <span>Subtotal:</span>
+                        <span>₹<span id="subtotal">{{ subtotal }}</span></span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Delivery Charges:</span>
+                        <span>₹40</span>
+                    </div>
+                    <div class="summary-total">
+                        <span>Total Amount:</span>
+                        <span>₹<span id="totalAmount">{{ total }}</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Address -->
+            <div class="form-section">
+                <div class="form-section-title">📍 Delivery Address</div>
+                <div class="form-group">
+                    <label for="address" class="form-label">Full Address *</label>
+                    <textarea name="address" id="address" class="form-control" placeholder="Enter your complete delivery address" required></textarea>
+                </div>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="form-section">
+                <div class="form-section-title">💳 Payment Method</div>
+                
+                <div class="payment-options">
+                    <!-- Cash on Delivery -->
+                    <div class="payment-option">
+                        <input type="radio" id="cod" name="payment_method" value="cod" class="payment-radio" checked>
+                        <label for="cod" class="payment-label">
+                            <div class="payment-icon">💵</div>
+                            <div class="payment-name">Cash on Delivery</div>
+                            <div style="font-size: 12px; color: #6b7280;">Pay at delivery</div>
+                        </label>
+                    </div>
+
+                    <!-- Online Payment -->
+                    <div class="payment-option">
+                        <input type="radio" id="online" name="payment_method" value="razorpay" class="payment-radio">
+                        <label for="online" class="payment-label">
+                            <div class="payment-icon">💰</div>
+                            <div class="payment-name">Online Payment</div>
+                            <div style="font-size: 12px; color: #6b7280;">UPI, Card, NetBanking</div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Razorpay Info -->
+                <div class="razorpay-container" id="razorpayInfo">
+                    <p style="color: #1f2937; margin: 0;">
+                        <strong>💳 Online Payment via Razorpay</strong><br>
+                        <span style="font-size: 12px; color: #6b7280;">Secure payment gateway. Supports UPI, Cards, NetBanking.</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="form-buttons">
+                <button type="submit" class="btn-place-order">✓ Place Order</button>
+                <a href="{% url 'main:cart' %}" class="btn-cancel">← Back to Cart</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Show/hide Razorpay info based on payment method
+    const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
+    const razorpayInfo = document.getElementById('razorpayInfo');
+
+    paymentRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'razorpay') {
+                razorpayInfo.classList.add('show');
+            } else {
+                razorpayInfo.classList.remove('show');
+            }
+        });
+    });
+
+    // Update totals (server would provide actual values)
+    document.addEventListener('DOMContentLoaded', function() {
+        // Calculate totals from cart (this is simplified)
+        const subtotal = document.getElementById('subtotal').textContent || '0';
+        const total = parseFloat(subtotal) + 40; // Add delivery charges
+        document.getElementById('totalAmount').textContent = total.toFixed(2);
+    });
+</script>
+{% endblock %}

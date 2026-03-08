@@ -1,0 +1,172 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<style>
+    .food-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+        padding: 20px 0;
+    }
+    .food-item {
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+    .food-item:hover {
+        transform: scale(1.05);
+    }
+    .food-item img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .food-item-name {
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+    }
+    /* .banner-img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-bottom: 40px; */
+    /* } */
+    .section-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        margin-top: 40px;
+    }
+
+   .app-banner{
+     width: 100%;
+     margin: 40px 0;
+     } 
+     .app-banner img{ 
+        width: 100%;
+         height: 300px;
+          object-fit: cover;
+           border-radius: 12px; }
+.banner-container {
+    width: 100vw;           
+    height: 200px;          
+    overflow: hidden;
+    margin: 0;              
+    padding: 0;             
+    position: relative;
+}
+
+.banner-img {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;      /* crop karke fit ho jaye */
+    display: block; 
+    border-radius: 12px;        /* inline spacing remove */
+}
+.banner-img.fade-out {
+    opacity: 0;
+}
+    #banner {
+        transition: opacity 1s ease-in-out;
+        opacity: 1;
+    }
+    #banner.fade-out {
+        opacity: 0;
+    }
+</style>
+
+<!-- Banner -->
+<div style="margin-bottom: 40px;">
+<img id="banner" src="https://res.cloudinary.com/djlrhj4sx/image/upload/v1772715645/OIP_21_uryvqu.webp" alt="Banner" class="banner-img"></div>
+
+<!-- Food Categories/Items Section -->
+<!-- Meals Section -->
+<div class="section-title">Order our best food options</div>
+<div class="food-grid">
+    
+    {% for cat in categories %}
+        <div class="food-item" onclick="filterByCategory('{{ cat.slug }}')">
+
+            {% if cat.name|lower == "north indian" %}
+                <img src="https://res.cloudinary.com/djlrhj4sx/image/upload/v1772538140/OIP_23_yt3ygf.webp">
+
+            {% elif cat.name|lower == "south indian" %}
+                <img src="https://res.cloudinary.com/djlrhj4sx/image/upload/v1772538763/1317028_kag6e0.jpg">
+            {% elif cat.name|lower == "dosa" %}
+                <img src="https://res.cloudinary.com/djlrhj4sx/image/upload/v1772538872/Plain-Dosa_xmuh3d.jpg">
+
+            {% elif cat.name|lower == "biryani" %}
+                <img src="https://res.cloudinary.com/djlrhj4sx/image/upload/v1772538660/ai-generated-chicken-biryani-kerala-style-chicken-dhum-biriyani-made-using-jeera-rice-and-spices-arranged-in-a-brass-serving-bowl-photo_wwh5vz.jpg">
+
+            {% elif cat.name|lower == "Dessert" %}
+                <img src="https://res.cloudinary.com/djlrhj4sx/image/upload/v1772538507/OIP_24_l1h06z.webp">
+            {% elif cat.name|lower == "pizza" %}
+                <img src="https://res.cloudinary.com/djlrhj4sx/image/upload/v1772538507/OIP_24_l1h06z.webp">
+            {% elif cat.name|lower == "cake" %}
+                <img src="https://res.cloudinary.com/djlrhj4sx/image/upload/v1772539048/OIP_27_iowlnz.webp">
+            
+            {% elif cat.name|lower == "burger" %}
+                <img src="https://res.cloudinary.com/djlrhj4sx/image/upload/v1772538591/OIP_25_hyt6nv.webp">
+
+            {% else %}
+                <img src="https://res.cloudinary.com/djlrhj4sx/image/upload/v1772538960/OIP_26_zof46e.webp">
+            {% endif %}
+
+            <div class="food-item-name">{{ cat.name }}</div>
+        </div>
+    {% endfor %}
+
+</div>
+
+
+<div class="app-banner">
+    <img src="{% static 'main/img/App_download_banner.avif' %}" alt="Download App">
+</div>
+
+<script>
+function filterByCategory(slug) {
+    window.location.href = "{% url 'main:restaurant_list' %}?category=" + slug;
+}
+
+
+
+
+
+
+    const bannerImages = [
+        "https://res.cloudinary.com/djlrhj4sx/image/upload/v1772715645/OIP_21_uryvqu.webp",
+        "https://res.cloudinary.com/djlrhj4sx/image/upload/v1772715660/dd5c69109e9d2dce35dba71301804aaa_banuqe.jpg"
+    ];
+
+    let currentIndex = 0;
+    const banner = document.getElementById('banner');
+
+    setInterval(() => {
+        // Fade out
+        banner.classList.add('fade-out');
+
+        setTimeout(() => {
+            // Change image after fade out
+            currentIndex = (currentIndex + 1) % bannerImages.length;
+            banner.src = bannerImages[currentIndex];
+
+            // Fade in
+            banner.classList.remove('fade-out');
+        }, 1000); // match transition duration
+    }, 1000); // 3 second per image
+
+
+
+
+
+
+
+</script>
+{% endblock %}

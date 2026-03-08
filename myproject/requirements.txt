@@ -1,0 +1,6 @@
+Django>=6.0
+Pillow
+requests
+# Optional for Cloudinary support
+cloudinary
+django-cloudinary-storage

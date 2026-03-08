@@ -1,0 +1,125 @@
+{% extends 'main/base.html' %}
+{% block title %}{% if restaurant %}Edit{% else %}Add{% endif %} Restaurant{% endblock %}
+{% block content %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .form-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 25px;
+        color: #1f2937;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: inherit;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+    .form-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    .btn-save {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+    .btn-save:hover {
+        background: #059669;
+    }
+    .btn-cancel {
+        background: #f3f4f6;
+        color: #1f2937;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+    .btn-cancel:hover {
+        background: #e5e7eb;
+    }
+    .errorlist {
+        color: #dc2626;
+        margin-bottom: 15px;
+        padding: 10px;
+        background: #fee2e2;
+        border-radius: 6px;
+        list-style: none;
+    }
+</style>
+
+<div class="form-container">
+    <div class="form-title">{% if restaurant %}✏️ Edit Restaurant{% else %}🆕 Add New Restaurant{% endif %}</div>
+    
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="errorlist">
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                    <div class="errorlist">
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <div class="form-buttons">
+            <button type="submit" class="btn-save">💾 Save Restaurant</button>
+            <a href="{% url 'main:manage_restaurants' %}" class="btn-cancel">← Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
